@@ -397,6 +397,55 @@ class Log extends DefaultFunction {
   Expression asNaturalLogarithm() => Ln(arg) / Ln(base);
 }
 
+/// The logarithm function.
+class Lim extends DefaultFunction {
+  /// Creates a logarithm function with given base and argument.
+  ///
+  /// For example, to create log_10(2):
+  ///
+  ///     base = Number(10);
+  ///     arg = Number(2);
+  ///     log = Log(base, arg);
+  ///
+  /// To create a naturally based logarithm, see [Ln].
+  Lim(Expression base, Expression arg) : super._binary('lim', base, arg);
+
+  /// The base of this logarithm.
+  Expression get base => getParam(0);
+
+  /// The argument of this logarithm.
+  Expression get arg => getParam(1);
+
+  @override
+  Expression derive(String toVar) => this.asNaturalLogarithm().derive(toVar);
+
+  /// Simplifies base and argument.
+  @override
+  Expression simplify() => Log(base.simplify(), arg.simplify());
+
+  @override
+  dynamic evaluate(EvaluationType type, ContextModel context) {
+    if (type == EvaluationType.REAL) {
+      // Be lazy, convert to Ln.
+      return asNaturalLogarithm().evaluate(type, context);
+    }
+
+    if (type == EvaluationType.INTERVAL) {
+      // log_a([x, y]) = [log_a(x), log_a(y)] for [x, y] positive and a > 1
+      return asNaturalLogarithm().evaluate(type, context);
+    }
+
+    throw UnimplementedError('Can not evaluate $name on $type yet.');
+  }
+
+  /// Returns the natural from of this logarithm.
+  /// E.g. log_10(2) = ln(2) / ln(10)
+  ///
+  /// This method is used to determine the derivation of a logarithmic
+  /// expression.
+  Expression asNaturalLogarithm() => Ln(arg) / Ln(base);
+}
+
 /// The natural logarithm (log based e).
 class Ln extends Log {
   /// Creates a natural logarithm function with given argument.
