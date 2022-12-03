@@ -46,6 +46,9 @@ abstract class Expression {
   /// Power operator. Creates a [Power] expression.
   Expression operator ^(Expression exp) => Power(this, exp);
 
+  /// Power operator. Creates a [Subscript] expression.
+  Expression operator ~/(Expression sub) => Subscript(this, sub);
+
   /// Unary minus operator. Creates a [UnaryMinus] expression.
   Expression operator -() => UnaryMinus(this);
 
@@ -656,6 +659,144 @@ class Power extends BinaryOperator {
 
   @override
   String toString() => '($first^$second)';
+
+  /// Returns the exponential form of this operation.
+  /// E.g. x^4 = e^(4*ln(x))
+  ///
+  /// This method is used to determine the derivation of a power expression.
+  Expression asE() => Exponential(second * Ln(first));
+}
+
+/// The Subscript operator.
+class Subscript extends BinaryOperator {
+  //TODO: correct class, so far this is only a copy from Power with the string changed
+  /// Creates a power operation on the given expressions.
+  ///
+  /// For example, to create x^3:
+  ///
+  ///     pow = Power('x', 3);
+  /// or:
+  ///
+  ///     pow = Variable('x') ^ Number(3.0);
+  Subscript(dynamic x, dynamic exp) : super(x, exp);
+
+  @override
+  Expression derive(String toVar) => this.asE().derive(toVar);
+
+  /// Possible simplifications:
+  ///
+  /// 1. 0^x = 0
+  /// 2. 1^x = 1
+  /// 3. x^0 = 1
+  /// 4. x^1 = x
+  @override
+  Expression simplify() {
+    final Expression baseOp = first.simplify();
+    final Expression exponentOp = second.simplify();
+
+    //TODO unboxing
+    /*
+    bool baseNegative = false, expNegative = false;
+
+    // unbox unary minuses
+    if (baseOp is UnaryMinus) {
+      baseOp = baseOp.exp;
+      baseNegative = !baseNegative;
+    }
+    if (exponentOp is UnaryMinus) {
+      exponentOp = exponentOp.exp;
+      expNegative = !expNegative;
+    }
+    */
+
+    if (_isNumber(baseOp, 0)) {
+      return baseOp; // 0^x = 0
+    }
+
+    if (_isNumber(baseOp, 1)) {
+      return baseOp; // 1^x = 1
+    }
+
+    if (_isNumber(exponentOp, 0)) {
+      return Number(1.0); // x^0 = 1
+    }
+
+    if (_isNumber(exponentOp, 1)) {
+      return baseOp; // x^1 = x
+    }
+
+    return Power(baseOp, exponentOp);
+  }
+
+  @override
+  dynamic evaluate(EvaluationType type, ContextModel context) {
+    final num base = first.evaluate(type, context);
+    if (type == EvaluationType.REAL) {
+      // Consider the following equation: x^(2/y).
+      // This equation can be evaluated for any negative x, since the sub result
+      // is positive due to the even numerator. However, the IEEE Standard for
+      // for Floating-Point Arithmetic defines NaN in the case of a negative
+      // base and a finite non-integer as the exponent. That's why we rewrite
+      // the equation manually.
+      if (base.isNegative && second is Divide) {
+        final num numerator = (second as Divide).first.evaluate(type, context);
+        final num denominator =
+            (second as Divide).second.evaluate(type, context);
+        return math.pow(math.pow(base, numerator), (1 / denominator));
+      }
+      return math.pow(base, second.evaluate(type, context));
+    }
+
+    if (type == EvaluationType.INTERVAL) {
+      // Expect base to be interval.
+      final Interval interval = first.evaluate(type, context);
+
+      // Expect exponent to be a natural number.
+      dynamic exponent = second.evaluate(EvaluationType.REAL, context);
+
+      if (exponent is double) {
+        //print('Warning, expected natural exponent but is real. Interpreting as int: ${this}');
+        exponent = exponent.toInt();
+      }
+
+      num evalMin, evalMax;
+      // Distinction of cases depending on oddity of exponent.
+      if (exponent.isOdd) {
+        // [x, y]^n = [x^n, y^n] for n = odd
+        evalMin = math.pow(interval.min, exponent);
+        evalMax = math.pow(interval.max, exponent);
+      } else {
+        // [x, y]^n = [x^n, y^n] for x >= 0
+        if (interval.min >= 0) {
+          // Positive interval.
+          evalMin = math.pow(interval.min, exponent);
+          evalMax = math.pow(interval.max, exponent);
+        }
+
+        // [x, y]^n = [y^n, x^n] for y < 0
+        if (interval.min >= 0) {
+          // Positive interval.
+          evalMin = math.pow(interval.max, exponent);
+          evalMax = math.pow(interval.min, exponent);
+        }
+
+        // [x, y]^n = [0, max(x^n, y^n)] otherwise
+        evalMin = 0;
+        evalMax = math.max(
+            math.pow(interval.min, exponent), math.pow(interval.min, exponent));
+      }
+
+      assert(evalMin <= evalMax);
+
+      return Interval(evalMin, evalMax);
+    }
+
+    throw UnimplementedError(
+        'Evaluate Power with type $type not supported yet.');
+  }
+
+  @override
+  String toString() => '(${first}_$second)';
 
   /// Returns the exponential form of this operation.
   /// E.g. x^4 = e^(4*ln(x))
