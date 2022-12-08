@@ -410,6 +410,10 @@ class Lim extends DefaultFunction {
   /// To create a naturally based logarithm, see [Ln].
   Lim(Expression base, Expression arg) : super._binary('lim', base, arg);
 
+  /// Creates a natural logarithm.
+  /// Must only be used internally by the [Ln] class.
+  Lim._ln(Expression arg) : super._binary('ln', Number(math.e), arg);
+
   /// The base of this logarithm.
   Expression get base => getParam(0);
 
@@ -425,7 +429,7 @@ class Lim extends DefaultFunction {
 
   @override
   dynamic evaluate(EvaluationType type, ContextModel context) {
-    /*if (type == EvaluationType.REAL) {
+    if (type == EvaluationType.REAL) {
       // Be lazy, convert to Ln.
       return asNaturalLogarithm().evaluate(type, context);
     }
@@ -435,7 +439,7 @@ class Lim extends DefaultFunction {
       return asNaturalLogarithm().evaluate(type, context);
     }
 
-    throw UnimplementedError('Can not evaluate $name on $type yet.');*/
+    throw UnimplementedError('Can not evaluate $name on $type yet.');
   }
 
   /// Returns the natural from of this logarithm.
