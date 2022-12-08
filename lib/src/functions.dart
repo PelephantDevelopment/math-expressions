@@ -622,7 +622,7 @@ class SinEx extends DefaultFunction {
 
   /// The argument of this sine function.
   Expression get arg => getParam(0);
-  Expression get exponent => getParam(1);
+  int get exponent => getParam(1) as int;
 
   @override
   Expression derive(String toVar) => Cos(arg) * arg.derive(toVar);
@@ -674,7 +674,7 @@ class CosEx extends DefaultFunction {
 
   /// The argument of this sine function.
   Expression get arg => getParam(0);
-  Expression get exponent => getParam(1);
+  int get exponent => getParam(1) as int;
 
   @override
   Expression derive(String toVar) => Cos(arg) * arg.derive(toVar);
@@ -726,7 +726,7 @@ class TanEx extends DefaultFunction {
 
   /// The argument of this sine function.
   Expression get arg => getParam(0);
-  Expression get exponent => getParam(1);
+  int get exponent => getParam(1) as int;
 
   @override
   Expression derive(String toVar) => Cos(arg) * arg.derive(toVar);
