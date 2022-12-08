@@ -397,7 +397,7 @@ class Log extends DefaultFunction {
   Expression asNaturalLogarithm() => Ln(arg) / Ln(base);
 }
 
-/// The logarithm function.
+/// The limit function.
 class Lim extends DefaultFunction {
   /// Creates a logarithm function with given base and argument.
   ///
@@ -425,7 +425,7 @@ class Lim extends DefaultFunction {
 
   @override
   dynamic evaluate(EvaluationType type, ContextModel context) {
-    if (type == EvaluationType.REAL) {
+    /*if (type == EvaluationType.REAL) {
       // Be lazy, convert to Ln.
       return asNaturalLogarithm().evaluate(type, context);
     }
@@ -435,7 +435,7 @@ class Lim extends DefaultFunction {
       return asNaturalLogarithm().evaluate(type, context);
     }
 
-    throw UnimplementedError('Can not evaluate $name on $type yet.');
+    throw UnimplementedError('Can not evaluate $name on $type yet.');*/
   }
 
   /// Returns the natural from of this logarithm.
@@ -613,6 +613,57 @@ class Sqrt extends Root {
 
   @override
   String toString() => 'sqrt($arg)';
+}
+
+/// The sine function. Expects input in `radians`.
+class SinEx extends DefaultFunction {
+  /// Creates a new sine function with given argument expression.
+  SinEx(Expression arg, int exponent) : super._unary('sin^{$exponent}', arg);
+
+  /// The argument of this sine function.
+  Expression get arg => getParam(0);
+
+  @override
+  Expression derive(String toVar) => Cos(arg) * arg.derive(toVar);
+
+  /// Possible simplifications:
+  ///
+  /// 1. sin(0) = 0
+  @override
+  Expression simplify() {
+    final Expression argSimpl = arg.simplify();
+
+    if (_isNumber(argSimpl, 0)) {
+      return Number(0); // sin(0) = 0
+    }
+
+    return Sin(argSimpl);
+  }
+
+  @override
+  dynamic evaluate(EvaluationType type, ContextModel context) {
+    final dynamic argEval = arg.evaluate(type, context);
+
+    if (type == EvaluationType.REAL) {
+      // Compensate for inaccuracies in machine-pi.
+      // If argEval divides cleanly from pi, return 0.
+      if ((argEval / math.pi).abs() % 1 == 0) {
+        return 0.0;
+      }
+      return math.sin(argEval);
+    }
+
+    if (type == EvaluationType.VECTOR) {
+      //TODO Apply function to all vector elements
+    }
+
+    if (type == EvaluationType.INTERVAL) {
+      // TODO evaluate endpoints and critical points ((1/2 + n) * pi)
+      // or just return [-1, 1] if half a period is in the given interval
+    }
+
+    throw UnimplementedError('Can not evaluate $name on $type yet.');
+  }
 }
 
 /// The sine function. Expects input in `radians`.
