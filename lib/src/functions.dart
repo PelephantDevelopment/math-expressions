@@ -615,7 +615,7 @@ class Sqrt extends Root {
   String toString() => 'sqrt($arg)';
 }
 
-/// The sine function. Expects input in `radians`.
+/// The sine ex function. Expects input in `radians`.
 class SinEx extends DefaultFunction {
   /// Creates a new sine function with given argument expression.
   SinEx(Expression arg, int exponent) : super._unary('sin^{$exponent}', arg);
@@ -642,7 +642,7 @@ class SinEx extends DefaultFunction {
 
   @override
   dynamic evaluate(EvaluationType type, ContextModel context) {
-    final dynamic argEval = arg.evaluate(type, context);
+    /*final dynamic argEval = arg.evaluate(type, context);
 
     if (type == EvaluationType.REAL) {
       // Compensate for inaccuracies in machine-pi.
@@ -662,7 +662,109 @@ class SinEx extends DefaultFunction {
       // or just return [-1, 1] if half a period is in the given interval
     }
 
-    throw UnimplementedError('Can not evaluate $name on $type yet.');
+    throw UnimplementedError('Can not evaluate $name on $type yet.');*/
+  }
+}
+
+/// The cos ex function. Expects input in `radians`.
+class CosEx extends DefaultFunction {
+  /// Creates a new sine function with given argument expression.
+  CosEx(Expression arg, int exponent) : super._unary('cos^{$exponent}', arg);
+
+  /// The argument of this sine function.
+  Expression get arg => getParam(0);
+
+  @override
+  Expression derive(String toVar) => Cos(arg) * arg.derive(toVar);
+
+  /// Possible simplifications:
+  ///
+  /// 1. sin(0) = 0
+  @override
+  Expression simplify() {
+    final Expression argSimpl = arg.simplify();
+
+    if (_isNumber(argSimpl, 0)) {
+      return Number(0); // sin(0) = 0
+    }
+
+    return Sin(argSimpl);
+  }
+
+  @override
+  dynamic evaluate(EvaluationType type, ContextModel context) {
+    /*final dynamic argEval = arg.evaluate(type, context);
+
+    if (type == EvaluationType.REAL) {
+      // Compensate for inaccuracies in machine-pi.
+      // If argEval divides cleanly from pi, return 0.
+      if ((argEval / math.pi).abs() % 1 == 0) {
+        return 0.0;
+      }
+      return math.sin(argEval);
+    }
+
+    if (type == EvaluationType.VECTOR) {
+      //TODO Apply function to all vector elements
+    }
+
+    if (type == EvaluationType.INTERVAL) {
+      // TODO evaluate endpoints and critical points ((1/2 + n) * pi)
+      // or just return [-1, 1] if half a period is in the given interval
+    }
+
+    throw UnimplementedError('Can not evaluate $name on $type yet.');*/
+  }
+}
+
+/// The tan ex function. Expects input in `radians`.
+class TanEx extends DefaultFunction {
+  /// Creates a new sine function with given argument expression.
+  TanEx(Expression arg, int exponent) : super._unary('tan^{$exponent}', arg);
+
+  /// The argument of this sine function.
+  Expression get arg => getParam(0);
+
+  @override
+  Expression derive(String toVar) => Cos(arg) * arg.derive(toVar);
+
+  /// Possible simplifications:
+  ///
+  /// 1. sin(0) = 0
+  @override
+  Expression simplify() {
+    final Expression argSimpl = arg.simplify();
+
+    if (_isNumber(argSimpl, 0)) {
+      return Number(0); // sin(0) = 0
+    }
+
+    return Sin(argSimpl);
+  }
+
+  @override
+  dynamic evaluate(EvaluationType type, ContextModel context) {
+    /*final dynamic argEval = arg.evaluate(type, context);
+
+    if (type == EvaluationType.REAL) {
+      // Compensate for inaccuracies in machine-pi.
+      // If argEval divides cleanly from pi, return 0.
+      if ((argEval / math.pi).abs() % 1 == 0) {
+        return 0.0;
+      }
+      return math.sin(argEval);
+    }
+
+    if (type == EvaluationType.VECTOR) {
+      //TODO Apply function to all vector elements
+    }
+
+    if (type == EvaluationType.INTERVAL) {
+      // TODO evaluate endpoints and critical points ((1/2 + n) * pi)
+      // or just return [-1, 1] if half a period is in the given interval
+    }
+
+    throw UnimplementedError('Can not evaluate $name on $type yet.');*/
   }
 }
 
