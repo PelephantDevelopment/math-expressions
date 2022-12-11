@@ -402,7 +402,7 @@ class ArrowRight extends BinaryOperator {
       first.evaluate(type, context) - second.evaluate(type, context);
 
   @override
-  String toString() => r'($first \rightarrow1 $second)';
+  String toString() => r'($first \rightarrow $second)';
 }
 
 /// The PlusMinus operator.
@@ -454,7 +454,7 @@ class PlusMinus extends BinaryOperator {
       first.evaluate(type, context) - second.evaluate(type, context);
 
   @override
-  String toString() => '($first \\pm $second)';
+  String toString() => r'($first \pm $second)';
 }
 
 /// The times operator performs a multiplication.
