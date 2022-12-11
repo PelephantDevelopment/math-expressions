@@ -361,6 +361,9 @@ class Log extends DefaultFunction {
   /// Must only be used internally by the [Ln] class.
   Log._ln(Expression arg) : super._binary('ln', Number(math.e), arg);
 
+  /// Must only be used internally by the [Ln] class.
+  Log._integral(Expression arg) : super._binary('int', Number(math.e), arg);
+
   /// The base of this logarithm.
   Expression get base => getParam(0);
 
@@ -412,7 +415,7 @@ class Lim extends DefaultFunction {
 
   /// Creates a natural logarithm.
   /// Must only be used internally by the [Ln] class.
-  Lim._ln(Expression arg) : super._binary('ln', Number(math.e), arg);
+  Lim._ln(Expression arg) : super._binary('lim', Number(math.e), arg);
 
   /// The base of this logarithm.
   Expression get base => getParam(0);
@@ -497,6 +500,55 @@ class Ln extends Log {
 
   @override
   String toString() => 'ln($arg)';
+}
+
+/// The integral.
+class Integral extends Log {
+  /// Creates a natural logarithm function with given argument.
+  ///
+  /// For example, to create ln(10):
+  ///
+  ///     num10 = Number(10);
+  ///     ln = Ln(num10);
+  ///
+  /// To create a logarithm with arbitrary base, see [Log].
+  Integral(Expression arg) : super._integral(arg);
+
+  @override
+  Expression derive(String toVar) => arg.derive(toVar) / arg;
+
+  /// Possible simplifications:
+  ///
+  /// 1. ln(1) = 0
+  @override
+  Expression simplify() {
+    final Expression argSimpl = arg.simplify();
+
+    if (_isNumber(argSimpl, 1)) {
+      return Number(0); // ln(1) = 0
+    }
+
+    return Ln(argSimpl);
+  }
+
+  @override
+  dynamic evaluate(EvaluationType type, ContextModel context) {
+    final dynamic argEval = arg.evaluate(type, context);
+
+    if (type == EvaluationType.REAL) {
+      return math.log(argEval);
+    }
+
+    if (type == EvaluationType.INTERVAL) {
+      // Expect argument of type interval
+      return Interval(math.log(argEval.min), math.log(argEval.max));
+    }
+
+    throw UnimplementedError('Can not evaluate $name on $type yet.');
+  }
+
+  @override
+  String toString() => 'int($arg)';
 }
 
 /// The n-th root function. n needs to be a natural number.

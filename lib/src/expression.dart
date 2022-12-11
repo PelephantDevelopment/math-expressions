@@ -301,6 +301,162 @@ class Minus extends BinaryOperator {
   String toString() => '($first - $second)';
 }
 
+/// The ArrowLeft operator.
+class ArrowLeft extends BinaryOperator {
+  /// Creates a subtaction operation on the given expressions.
+  ///
+  /// For example, to create 5 - x:
+  ///
+  ///     subtraction = Minus(5, 'x');
+  ///
+  /// or:
+  ///
+  ///     subtraction = Number(5) - Variable('x');
+  ArrowLeft(dynamic first, dynamic second) : super(first, second);
+
+  @override
+  Expression derive(String toVar) =>
+      Minus(first.derive(toVar), second.derive(toVar));
+
+  /// Possible simplifications:
+  ///
+  /// 1. a - 0 = a
+  /// 2. 0 - a = - a
+  /// 3. a - -(b) = a + b
+  @override
+  Expression simplify() {
+    final Expression firstOp = first.simplify();
+    final Expression secondOp = second.simplify();
+
+    if (_isNumber(secondOp, 0)) {
+      return firstOp;
+    }
+
+    if (_isNumber(firstOp, 0)) {
+      return -secondOp;
+    }
+
+    if (secondOp is UnaryMinus) {
+      return firstOp + secondOp.exp; // a - -(b) = a + b
+    }
+
+    return Minus(firstOp, secondOp);
+    //TODO -a + b = b - a
+    //TODO -a - b = - (a + b)
+  }
+
+  @override
+  dynamic evaluate(EvaluationType type, ContextModel context) =>
+      first.evaluate(type, context) - second.evaluate(type, context);
+
+  @override
+  String toString() => '($first \leftarrow $second)';
+}
+
+/// The ArrowRight operator.
+class ArrowRight extends BinaryOperator {
+  /// Creates a subtaction operation on the given expressions.
+  ///
+  /// For example, to create 5 - x:
+  ///
+  ///     subtraction = Minus(5, 'x');
+  ///
+  /// or:
+  ///
+  ///     subtraction = Number(5) - Variable('x');
+  ArrowRight(dynamic first, dynamic second) : super(first, second);
+
+  @override
+  Expression derive(String toVar) =>
+      Minus(first.derive(toVar), second.derive(toVar));
+
+  /// Possible simplifications:
+  ///
+  /// 1. a - 0 = a
+  /// 2. 0 - a = - a
+  /// 3. a - -(b) = a + b
+  @override
+  Expression simplify() {
+    final Expression firstOp = first.simplify();
+    final Expression secondOp = second.simplify();
+
+    if (_isNumber(secondOp, 0)) {
+      return firstOp;
+    }
+
+    if (_isNumber(firstOp, 0)) {
+      return -secondOp;
+    }
+
+    if (secondOp is UnaryMinus) {
+      return firstOp + secondOp.exp; // a - -(b) = a + b
+    }
+
+    return Minus(firstOp, secondOp);
+    //TODO -a + b = b - a
+    //TODO -a - b = - (a + b)
+  }
+
+  @override
+  dynamic evaluate(EvaluationType type, ContextModel context) =>
+      first.evaluate(type, context) - second.evaluate(type, context);
+
+  @override
+  String toString() => '($first \rightarrow $second)';
+}
+
+/// The PlusMinus operator.
+class PlusMinus extends BinaryOperator {
+  /// Creates a subtaction operation on the given expressions.
+  ///
+  /// For example, to create 5 - x:
+  ///
+  ///     subtraction = Minus(5, 'x');
+  ///
+  /// or:
+  ///
+  ///     subtraction = Number(5) - Variable('x');
+  PlusMinus(dynamic first, dynamic second) : super(first, second);
+
+  @override
+  Expression derive(String toVar) =>
+      Minus(first.derive(toVar), second.derive(toVar));
+
+  /// Possible simplifications:
+  ///
+  /// 1. a - 0 = a
+  /// 2. 0 - a = - a
+  /// 3. a - -(b) = a + b
+  @override
+  Expression simplify() {
+    final Expression firstOp = first.simplify();
+    final Expression secondOp = second.simplify();
+
+    if (_isNumber(secondOp, 0)) {
+      return firstOp;
+    }
+
+    if (_isNumber(firstOp, 0)) {
+      return -secondOp;
+    }
+
+    if (secondOp is UnaryMinus) {
+      return firstOp + secondOp.exp; // a - -(b) = a + b
+    }
+
+    return Minus(firstOp, secondOp);
+    //TODO -a + b = b - a
+    //TODO -a - b = - (a + b)
+  }
+
+  @override
+  dynamic evaluate(EvaluationType type, ContextModel context) =>
+      first.evaluate(type, context) - second.evaluate(type, context);
+
+  @override
+  String toString() => '($first \pm $second)';
+}
+
 /// The times operator performs a multiplication.
 class Times extends BinaryOperator {
   /// Creates a product operation on the given expressions.
