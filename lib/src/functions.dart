@@ -503,32 +503,28 @@ class Ln extends Log {
 }
 
 /// The integral.
-class Integral extends Log {
-  /// Creates a natural logarithm function with given argument.
-  ///
-  /// For example, to create ln(10):
-  ///
-  ///     num10 = Number(10);
-  ///     ln = Ln(num10);
-  ///
-  /// To create a logarithm with arbitrary base, see [Log].
-  Integral(Expression arg) : super._integral(arg);
+class Integral extends DefaultFunction {
+  /// Creates a new sine function with given argument expression.
+  Integral(Expression arg) : super._unary('int', arg);
+
+  /// The argument of this sine function.
+  Expression get arg => getParam(0);
 
   @override
-  Expression derive(String toVar) => arg.derive(toVar) / arg;
+  Expression derive(String toVar) => Cos(arg) * arg.derive(toVar);
 
   /// Possible simplifications:
   ///
-  /// 1. ln(1) = 0
+  /// 1. sin(0) = 0
   @override
   Expression simplify() {
     final Expression argSimpl = arg.simplify();
 
-    if (_isNumber(argSimpl, 1)) {
-      return Number(0); // ln(1) = 0
+    if (_isNumber(argSimpl, 0)) {
+      return Number(0); // sin(0) = 0
     }
 
-    return Ln(argSimpl);
+    return Sin(argSimpl);
   }
 
   @override
@@ -536,19 +532,25 @@ class Integral extends Log {
     final dynamic argEval = arg.evaluate(type, context);
 
     if (type == EvaluationType.REAL) {
-      return math.log(argEval);
+      // Compensate for inaccuracies in machine-pi.
+      // If argEval divides cleanly from pi, return 0.
+      if ((argEval / math.pi).abs() % 1 == 0) {
+        return 0.0;
+      }
+      return math.sin(argEval);
+    }
+
+    if (type == EvaluationType.VECTOR) {
+      //TODO Apply function to all vector elements
     }
 
     if (type == EvaluationType.INTERVAL) {
-      // Expect argument of type interval
-      return Interval(math.log(argEval.min), math.log(argEval.max));
+      // TODO evaluate endpoints and critical points ((1/2 + n) * pi)
+      // or just return [-1, 1] if half a period is in the given interval
     }
 
     throw UnimplementedError('Can not evaluate $name on $type yet.');
   }
-
-  @override
-  String toString() => 'int($arg)';
 }
 
 /// The n-th root function. n needs to be a natural number.
