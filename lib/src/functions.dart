@@ -932,6 +932,58 @@ class Cos extends DefaultFunction {
   }
 }
 
+/// The sec function. Expects input in `radians`.
+class Sec extends DefaultFunction {
+  /// Creates a new cosine function with given argument expression.
+  Sec(Expression arg) : super._unary('sec', arg);
+
+  /// The argument of this cosine function.
+  Expression get arg => getParam(0);
+
+  @override
+  Expression derive(String toVar) => -Sin(arg) * arg.derive(toVar);
+
+  /// Possible simplifications:
+  ///
+  /// 1. cos(0) = 1
+  @override
+  Expression simplify() {
+    final Expression argSimpl = arg.simplify();
+
+    if (_isNumber(argSimpl, 0)) {
+      return Number(1); // cos(0) = 1
+    }
+
+    return Cos(argSimpl);
+  }
+
+  @override
+  dynamic evaluate(EvaluationType type, ContextModel context) {
+    final dynamic argEval = arg.evaluate(type, context);
+
+    if (type == EvaluationType.REAL) {
+      // Compensate for inaccuracies in machine-pi.
+      //
+      // If argEval divides cleanly from pi (when shifted back to Sin from Cos), return 0.
+      if (((argEval - math.pi / 2) / math.pi).abs() % 1 == 0) {
+        return 0.0;
+      }
+      return math.cos(argEval);
+    }
+
+    if (type == EvaluationType.VECTOR) {
+      //TODO apply function to all vector elements
+    }
+
+    if (type == EvaluationType.INTERVAL) {
+      // TODO evaluate endpoints and critical points (n * pi)
+      // or just return [-1, 1] if half a period is in the given interval
+    }
+
+    throw UnimplementedError('Can not evaluate $name on $type yet.');
+  }
+}
+
 /// The tangens function. Expects input in `radians`.
 class Tan extends DefaultFunction {
   /// Creates a new tangens function with given argument expression.

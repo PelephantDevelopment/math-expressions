@@ -405,6 +405,58 @@ class ArrowRight extends BinaryOperator {
   String toString() => r'($first \rightarrow $second)';
 }
 
+/// The ArrowLeftRight operator.
+class ArrowLeftRight extends BinaryOperator {
+  /// Creates a subtaction operation on the given expressions.
+  ///
+  /// For example, to create 5 - x:
+  ///
+  ///     subtraction = Minus(5, 'x');
+  ///
+  /// or:
+  ///
+  ///     subtraction = Number(5) - Variable('x');
+  ArrowLeftRight(dynamic first, dynamic second) : super(first, second);
+
+  @override
+  Expression derive(String toVar) =>
+      Minus(first.derive(toVar), second.derive(toVar));
+
+  /// Possible simplifications:
+  ///
+  /// 1. a - 0 = a
+  /// 2. 0 - a = - a
+  /// 3. a - -(b) = a + b
+  @override
+  Expression simplify() {
+    final Expression firstOp = first.simplify();
+    final Expression secondOp = second.simplify();
+
+    if (_isNumber(secondOp, 0)) {
+      return firstOp;
+    }
+
+    if (_isNumber(firstOp, 0)) {
+      return -secondOp;
+    }
+
+    if (secondOp is UnaryMinus) {
+      return firstOp + secondOp.exp; // a - -(b) = a + b
+    }
+
+    return Minus(firstOp, secondOp);
+    //TODO -a + b = b - a
+    //TODO -a - b = - (a + b)
+  }
+
+  @override
+  dynamic evaluate(EvaluationType type, ContextModel context) =>
+      first.evaluate(type, context) - second.evaluate(type, context);
+
+  @override
+  String toString() => r'($first \leftrightarrow $second)';
+}
+
 /// The Equation operator.
 class Equation extends BinaryOperator {
   /// Creates a subtaction operation on the given expressions.
