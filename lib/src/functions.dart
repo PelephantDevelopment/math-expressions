@@ -829,6 +829,58 @@ class TanEx extends DefaultFunction {
   }
 }
 
+/// The sec ex function. Expects input in `radians`.
+class SecEx extends DefaultFunction {
+  /// Creates a new sine function with given argument expression.
+  SecEx(Expression arg, int exponent) : super._unary('sec^{$exponent}', arg);
+
+  /// The argument of this sine function.
+  Expression get arg => getParam(0);
+  int get exponent => getParam(1) as int;
+
+  @override
+  Expression derive(String toVar) => Cos(arg) * arg.derive(toVar);
+
+  /// Possible simplifications:
+  ///
+  /// 1. sin(0) = 0
+  @override
+  Expression simplify() {
+    final Expression argSimpl = arg.simplify();
+
+    if (_isNumber(argSimpl, 0)) {
+      return Number(0); // sin(0) = 0
+    }
+
+    return Sin(argSimpl);
+  }
+
+  @override
+  dynamic evaluate(EvaluationType type, ContextModel context) {
+    /*final dynamic argEval = arg.evaluate(type, context);
+
+    if (type == EvaluationType.REAL) {
+      // Compensate for inaccuracies in machine-pi.
+      // If argEval divides cleanly from pi, return 0.
+      if ((argEval / math.pi).abs() % 1 == 0) {
+        return 0.0;
+      }
+      return math.sin(argEval);
+    }
+
+    if (type == EvaluationType.VECTOR) {
+      //TODO Apply function to all vector elements
+    }
+
+    if (type == EvaluationType.INTERVAL) {
+      // TODO evaluate endpoints and critical points ((1/2 + n) * pi)
+      // or just return [-1, 1] if half a period is in the given interval
+    }
+
+    throw UnimplementedError('Can not evaluate $name on $type yet.');*/
+  }
+}
+
 /// The sine function. Expects input in `radians`.
 class Sin extends DefaultFunction {
   /// Creates a new sine function with given argument expression.
@@ -1112,6 +1164,37 @@ class Atan extends DefaultFunction {
   @override
   Expression simplify() {
     return Atan(arg.simplify());
+  }
+
+  @override
+  dynamic evaluate(EvaluationType type, ContextModel context) {
+    final dynamic argEval = arg.evaluate(type, context);
+
+    if (type == EvaluationType.REAL) {
+      return math.atan(argEval);
+    }
+
+    // TODO VECTOR and INTERVAL evaluation
+    throw UnimplementedError('Can not evaluate $name on $type yet.');
+  }
+}
+
+/// The arcus tangens function.
+class Asec extends DefaultFunction {
+  /// Creates a new arcus tangens function with given argument expression.
+  Asec(Expression arg) : super._unary('arcsec', arg);
+
+  /// The argument of this arcus tangens function.
+  Expression get arg => getParam(0);
+
+  @override
+  Expression derive(String toVar) =>
+      Number(1) / (Number(1) + (arg ^ Number(2)));
+
+  /// Possible simplifications:
+  @override
+  Expression simplify() {
+    return Asec(arg.simplify());
   }
 
   @override
