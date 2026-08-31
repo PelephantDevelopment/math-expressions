@@ -799,7 +799,7 @@ class ExpressionTests extends TestSet {
     expect(eval, equals(double.negativeInfinity));
     // Log_2(-1) -> NaN
     eval = Log(base, -one).evaluate(real, cm);
-    expect(eval, isNot(equals(eval))); // (Nan != NaN) = true
+    expect(eval.isNaN, isTrue); // (Nan != NaN) = true
     // Log_2(1) -> 0.0
     eval = Log(base, one).evaluate(real, cm);
     expect(eval, equals(0.0));
@@ -809,7 +809,7 @@ class ExpressionTests extends TestSet {
     // Log_2(-INFTY) -> INFTY
     eval = Log(base, negInfty).evaluate(real, cm);
     //expect(eval, equals(double.INFINITY)); //TODO check this
-    expect(eval, isNot(equals(eval)));
+    expect(eval.isNaN, isTrue);
 
     /*
      * Ln
@@ -819,7 +819,7 @@ class ExpressionTests extends TestSet {
     expect(eval, equals(double.negativeInfinity));
     // Ln(-1) -> NaN
     eval = Ln(-one).evaluate(real, cm);
-    expect(eval, isNot(equals(eval)));
+    expect(eval.isNaN, isTrue);
     // Ln(1) -> 0.0
     eval = Ln(one).evaluate(real, cm);
     expect(eval, equals(0.0));
@@ -832,7 +832,7 @@ class ExpressionTests extends TestSet {
     // Ln(-INFTY) -> 0.0
     eval = Ln(negInfty).evaluate(real, cm);
     //expect(eval, equals(double.INFINITY)); //TODO check this
-    expect(eval, isNot(equals(eval)));
+    expect(eval.isNaN, isTrue);
 
     /*
      * Cos
@@ -857,10 +857,10 @@ class ExpressionTests extends TestSet {
     expect(eval, equals(0));
     // cos(INFTY) -> [-1,1] / NaN
     eval = Cos(infinity).evaluate(real, cm);
-    expect(eval, isNot(equals(eval))); // NaN
+    expect(eval.isNaN, isTrue); // NaN
     // cos(-INFTY) -> [-1,1] / NaN
     eval = Cos(negInfty).evaluate(real, cm);
-    expect(eval, isNot(equals(eval))); // NaN
+    expect(eval.isNaN, isTrue); // NaN
 
     /*
      * Sin
@@ -882,10 +882,10 @@ class ExpressionTests extends TestSet {
     expect(eval, equals(0));
     // sin(INFTY) -> [-1,1] / NaN
     eval = Sin(infinity).evaluate(real, cm);
-    expect(eval, isNot(equals(eval))); // NaN
+    expect(eval.isNaN, isTrue); // NaN
     // sin(-INFTY) -> [-1,1] / NaN
     eval = Sin(negInfty).evaluate(real, cm);
-    expect(eval, isNot(equals(eval))); // NaN
+    expect(eval.isNaN, isTrue); // NaN
 
     /*
      * Tan
@@ -907,10 +907,10 @@ class ExpressionTests extends TestSet {
     expect(eval, closeTo(0, 0.00001));
     // tan(INFTY) -> <INFTY / NaN
     eval = Tan(infinity).evaluate(real, cm);
-    expect(eval, isNot(equals(eval))); // NaN
+    expect(eval.isNaN, isTrue); // NaN
     // tan(-INFTY) -> <INFTY / NaN
     eval = Tan(negInfty).evaluate(real, cm);
-    expect(eval, isNot(equals(eval))); // NaN
+    expect(eval.isNaN, isTrue); // NaN
 
     /*
      * Asin
@@ -926,16 +926,16 @@ class ExpressionTests extends TestSet {
     expect(eval, closeTo(math.pi / 2, 0.00001));
     // arcsin(2) = NaN
     eval = Asin(Number(2)).evaluate(real, cm);
-    expect(eval, isNot(equals(eval))); // NaN
+    expect(eval.isNaN, isTrue); // NaN
     // arcsin(-2) = NaN
     eval = Asin(-Number(2)).evaluate(real, cm);
-    expect(eval, isNot(equals(eval))); // NaN
+    expect(eval.isNaN, isTrue); // NaN
     // arcsin(∞) = -∞
     eval = Asin(infinity).evaluate(real, cm);
-    expect(eval, isNot(equals(eval))); // NaN
+    expect(eval.isNaN, isTrue); // NaN
     // arcsin(-∞) = ∞
     eval = Asin(negInfty).evaluate(real, cm);
-    expect(eval, isNot(equals(eval))); // NaN
+    expect(eval.isNaN, isTrue); // NaN
 
     /*
      * Acos
@@ -951,16 +951,16 @@ class ExpressionTests extends TestSet {
     expect(eval, equals(0.0));
     // arccos(2) = NaN
     eval = Acos(Number(2)).evaluate(real, cm);
-    expect(eval, isNot(equals(eval))); // NaN
+    expect(eval.isNaN, isTrue); // NaN
     // arccos(-2) = NaN
     eval = Acos(-Number(2)).evaluate(real, cm);
-    expect(eval, isNot(equals(eval))); // NaN
+    expect(eval.isNaN, isTrue); // NaN
     // arccos(∞) = -∞
     eval = Acos(infinity).evaluate(real, cm);
-    expect(eval, isNot(equals(eval))); // NaN
+    expect(eval.isNaN, isTrue); // NaN
     // arccos(-∞) = ∞
     eval = Acos(negInfty).evaluate(real, cm);
-    expect(eval, isNot(equals(eval))); // NaN
+    expect(eval.isNaN, isTrue); // NaN
 
     /*
      * Atan
@@ -991,7 +991,7 @@ class ExpressionTests extends TestSet {
     expect(eval, equals(0.0));
     // root_5(-1) = NaN
     eval = Root(grade, -one).evaluate(real, cm);
-    expect(eval, isNot(equals(eval)));
+    expect(eval.isNaN, isTrue);
     // root_5(1) = 1
     eval = Root(grade, one).evaluate(real, cm);
     expect(eval, equals(1));
@@ -1019,7 +1019,7 @@ class ExpressionTests extends TestSet {
     expect(eval, equals(0.0));
     // sqrt(-1) = NaN
     eval = Sqrt(-one).evaluate(real, cm);
-    expect(eval, isNot(equals(eval)));
+    expect(eval.isNaN, isTrue);
     // sqrt(1) = 1
     eval = Sqrt(one).evaluate(real, cm);
     expect(eval, equals(1));
@@ -1031,7 +1031,7 @@ class ExpressionTests extends TestSet {
     expect(eval, equals(double.infinity));
     // sqrt(-INFTY) ->  NaN
     eval = Sqrt(negInfty).evaluate(real, cm);
-    expect(eval, isNot(equals(eval)));
+    expect(eval.isNaN, isTrue);
 
     /*
      * Abs
@@ -1374,7 +1374,7 @@ class ExpressionTests extends TestSet {
     return false;
   }
 
-  Matcher _equalsExpression(String expr, {bool simplify: true}) =>
+  Matcher _equalsExpression(String expr, {bool simplify = true}) =>
       ExpressionMatcher(expr, simplify: simplify);
 }
 
@@ -1393,7 +1393,7 @@ class ExpressionMatcher extends Matcher {
    * Creates a new Expression matcher. If [simplify] is true, the expression to
    * match will be simplified as much as possible before testing.
    */
-  ExpressionMatcher(String expression, {bool simplify: true})
+  ExpressionMatcher(String expression, {bool simplify = true})
       : this._expression = expression,
         this._exprRPN = _lexer.tokenizeToRPN(expression),
         this._simplify = simplify;
